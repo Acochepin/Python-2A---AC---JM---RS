@@ -10,6 +10,209 @@
   },
   {
    "cell_type": "code",
+   "execution_count": 8,
+   "id": "70534cfa-e809-477d-a67b-1890ca910568",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Collecting openpyxl\n",
+      "  Downloading openpyxl-3.0.10-py2.py3-none-any.whl (242 kB)\n",
+      "\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m242.1/242.1 kB\u001b[0m \u001b[31m8.3 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+      "\u001b[?25hCollecting et-xmlfile\n",
+      "  Downloading et_xmlfile-1.1.0-py3-none-any.whl (4.7 kB)\n",
+      "Installing collected packages: et-xmlfile, openpyxl\n",
+      "Successfully installed et-xmlfile-1.1.0 openpyxl-3.0.10\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install openpyxl\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "c99a3e86-2e7d-45b2-ae48-368162eb109a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import statsmodels.api as sm\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b222b79f-f478-48ac-a27c-a85e73b94dbb",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df = pd.read_excel (\"ival-2021---complet-xlsx-112652.xlsx\", header = [0,1])\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "55c6036b-dcd4-4811-a5e0-dccd228c4c86",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fichier_LGT = df.copy()\n",
+    "fichier_LGT = fichier_LGT.drop ([\"Valeur ajoutée du taux d'accès\", \"Taux d'accès attendus\", \"Taux d'accès bruts\", \"Effectifs à la rentrée 2021\", \"Taux de mentions attendus\", \"Taux de réussite attendus\", \"Taux de mentions bruts\", \"Valeur ajoutée de taux de mentions\"], axis = 1)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "14b3a37c-a55d-49f7-a26e-752f2edff343",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fichier_LGT = fichier_LGT.fillna(0)\n",
+    "#fichier.loc[:,(\"Nombre d'élèves présents au Bac\",\"Somme Pro\")] = fichier[\"Nombre d'élèves présents au Bac\", \"STMG\"] + fichier[\"Nombre d'élèves présents au Bac\", \"STI2D\"] + fichier[\"Nombre d'élèves présents au Bac\", \"STD2A\"]+fichier[\"Nombre d'élèves présents au Bac\", \"STL\"]+df_rose[\"Nombre d'élèves présents au Bac\", \"ST2S\"]+fichier[\"Nombre d'élèves présents au Bac\", \"S2TMD\"]+fichier[\"Nombre d'élèves présents au Bac\", \"STHR\"]#\n",
+    "fichier_LGT.loc[:,(\"Nombre d'élèves présents au Bac\",\"Somme Techno\")] = fichier_LGT[\"Nombre d'élèves présents au Bac\", 'TOTAL']- fichier_LGT[\"Nombre d'élèves présents au Bac\", \"GNLE\"]\n",
+    "fichier_LGT[\"Nombre d'élèves présents au Bac\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f052d0e2-4d4e-40b8-8943-e402c34d5daa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "stmg = fichier_LGT[\"Taux de réussite bruts\", \"STMG\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STMG\"]\n",
+    "sti2d = fichier_LGT[\"Taux de réussite bruts\", \"STI2D\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STI2D\"]\n",
+    "std2a = fichier_LGT[\"Taux de réussite bruts\", \"STD2A\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STD2A\"]\n",
+    "stl = fichier_LGT[\"Taux de réussite bruts\", \"STL\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STL\"]\n",
+    "st2s = fichier_LGT[\"Taux de réussite bruts\", \"ST2S\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"ST2S\"]\n",
+    "s2tmd = fichier_LGT[\"Taux de réussite bruts\", \"S2TMD\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"S2TMD\"]\n",
+    "sthr = fichier_LGT[\"Taux de réussite bruts\", \"STHR\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STHR\"]\n",
+    "taux_tech_brut = (stmg + sti2d + std2a + stl + st2s + s2tmd + sthr)/fichier_LGT[\"Nombre d'élèves présents au Bac\",\"Somme Techno\"]\n",
+    "\n",
+    "\n",
+    "fichier_LGT.loc[(fichier_LGT[\"Nombre d'élèves présents au Bac\",\"Somme Techno\"] > 0.5),(\"Taux de réussite bruts\", \"Taux brut techno\")] = taux_tech_brut #>0.5 pour éviter erreurs d'arrondi de flottants#\n",
+    "fichier_LGT[\"Taux de réussite bruts\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "f83d7de2-a2f7-468f-8a09-7e5b03630bfa",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "liste= [\"GNLE\", \"STMG\", \"STI2D\", \"STD2A\", \"STL\", \"ST2S\", \"S2TMD\", \"STHR\", \"TOTAL\"]\n",
+    "for i in liste:\n",
+    "    fichier_LGT.loc[fichier_LGT[\"Valeur ajoutée du taux de réussite\", i] == \"ND\", (\"Valeur ajoutée du taux de réussite\", i)] = np.NaN\n",
+    "    fichier_LGT[\"Valeur ajoutée du taux de réussite\", i] = pd.to_numeric(fichier_LGT[\"Valeur ajoutée du taux de réussite\", i])\n",
+    "fichier_LGT[\"Valeur ajoutée du taux de réussite\"].info()\n",
+    "fichier_LGT[\"Valeur ajoutée du taux de réussite\"]\n",
+    "\n",
+    "fichier_LGT.columns = fichier_LGT.columns.map('_'.join).str.strip('_')\n",
+    "fichier_LGT = fichier_LGT.drop([\"Nombre d'élèves présents au Bac_STMG\",\"Nombre d'élèves présents au Bac_STI2D\", \"Nombre d'élèves présents au Bac_STD2A\", \"Nombre d'élèves présents au Bac_STL\", \"Nombre d'élèves présents au Bac_ST2S\",\"Nombre d'élèves présents au Bac_S2TMD\", \"Nombre d'élèves présents au Bac_STHR\", \"Taux de réussite bruts_STMG\",\n",
+    "\"Taux de réussite bruts_STI2D\",\"Taux de réussite bruts_STD2A\",\"Taux de réussite bruts_STL\",\"Taux de réussite bruts_ST2S\",\"Taux de réussite bruts_S2TMD\",\"Taux de réussite bruts_STHR\", \"Valeur ajoutée du taux de réussite_STMG\",\"Valeur ajoutée du taux de réussite_STI2D\",\"Valeur ajoutée du taux de réussite_STD2A\", \"Valeur ajoutée du taux de réussite_STL\", \"Valeur ajoutée du taux de réussite_ST2S\", \"Valeur ajoutée du taux de réussite_S2TMD\", \"Valeur ajoutée du taux de réussite_STHR\"], axis=1)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0bd9c7db-7034-4fd5-8dad-283768a8bb80",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df2 = pd.read_excel (\"ival-2021---complet-xlsx-112652.xlsx\", sheet_name = 1, header = [0,1])\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "fee1a598-5283-444c-84d3-457e7db2b960",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fichier_LP = df2.copy()\n",
+    "fichier_LP = fichier_LP.drop ([\"Valeur ajoutée du taux d'accès\", \"Taux d'accès attendus\", \"Taux d'accès bruts\", \"Effectifs à la rentrée 2021\", \"Taux de mentions attendus\", \"Taux de réussite attendus\"], axis = 1)\n",
+    "fichier_LP.columns = fichier_LP.columns.map('_'.join).str.strip('_')\n",
+    "col_cons = ['Informations établissement_Académie', 'Informations établissement_Département', 'Informations établissement_Etablissement', 'Informations établissement_Ville', 'Informations établissement_UAI', 'Informations établissement_Code commune', 'Informations établissement_Secteur', \"Nombre d'élèves présents au Bac_TOTAL\", 'Taux de réussite bruts_TOTAL', 'Valeur ajoutée du taux de réussite_TOTAL']\n",
+    "fichier_LP = fichier_LP[col_cons]\n",
+    "fichier_LP = fichier_LP.rename(columns={\"Nombre d'élèves présents au Bac_TOTAL\": \"Nombre d'élèves présents au Bac_TOTAL_Pro\"})\n",
+    "fichier_LP = fichier_LP.rename(columns={\"Taux de réussite bruts_TOTAL\" : \"Taux de réussite bruts_TOTAL_Pro\"})\n",
+    "fichier_LP = fichier_LP.rename(columns={\"Taux de mentions bruts_TOTAL\" : \"Taux de mentions bruts_TOTAL_Pro\"})\n",
+    "fichier_LP = fichier_LP.rename(columns={\"Valeur ajoutée du taux de réussite_TOTAL\" : \"Valeur ajoutée du taux de réussite_TOTAL_Pro\"})\n",
+    "fichier_LP"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7783769a-7208-4cf4-a23a-2adf4925c704",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "dftotale = pd.concat([fichier_LGT, fichier_LP])\n",
+    "dftotale"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "12eea7a3-f729-48c4-803d-9e5d518ec39e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_communes = pd.read_excel(\"FILO2019_DEC_COM.xlsx\", sheet_name = 1, header=[4,5])\n",
+    "df_com = df_communes.copy()\n",
+    "df_com = df_com.drop(['PMIMP19', 'Q119', 'Q319','Q3_Q1','D119', 'D219', 'D319', 'D419', 'D619', 'D719', 'D819', 'D919', 'RD', 'S80S2019', 'PACT19', 'PTSA19', 'PCHO19', 'PBEN19', 'PPEN19', 'PAUT19'], axis = 1, level = 1 )\n",
+    "df_com\n",
+    "\n",
+    "df_com = df_com.dropna(axis = 0, how = \"any\")\n",
+    "df_com\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e6540485-7f4d-4c21-a846-92c5bfcb70be",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df_com.columns = df_com.columns.map('_'.join).str.strip('_') #On indexe de manière simple la base de données des communes pour faciliter la jointure\n",
+    "dflyccom = pd.merge(dftotale, df_com, how='left', left_on='Informations établissement_Code commune', right_on='Code géographique_CODGEO')\n",
+    "dflyccom"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "eb96b333-6dfd-4bd2-997d-6f47a0be1d5e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "dfdef = dflyccom.copy()\n",
+    "\n",
+    "dfdef[\"Nombre d'élèves présents au Bac_GNLE\"]= dfdef[\"Nombre d'élèves présents au Bac_GNLE\"].replace(0, np.nan)\n",
+    "dfdef[\"Nombre d'élèves présents au Bac_Somme Techno\"] = dfdef[\"Nombre d'élèves présents au Bac_Somme Techno\"].replace(0, np.nan)\n",
+    "dfdef[\"Nombre d'élèves présents au Bac_TOTAL_Pro\"] = dfdef[\"Nombre d'élèves présents au Bac_TOTAL_Pro\"].replace(0, np.nan)\n",
+    "for i in range(4329):\n",
+    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_GNLE\"])==True: #Si personne ne s'est présenté au bac général\n",
+    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_GNLE\"] = np.nan #On n'associe pas de valeur au taux de réussite brut\n",
+    "        dfdef.loc[dfdef.index[i],\"Valeur ajoutée du taux de réussite_GNLE\"] = np.nan #On n'associe pas de valeur à la valeur ajoutée du taux de réussite\n",
+    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_Somme Techno\"])==True: #Bac technologique \n",
+    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_Taux brut techno\"] = np.nan\n",
+    "        dfdef.loc[dfdef.index[i],\"Valeur ajoutée du taux de réussite_Valeur ajoutée techno\"] = np.nan\n",
+    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_TOTAL_Pro\"])==True: #Bac Pro\n",
+    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_TOTAL_Pro\"] = np.nan\n",
+    "        dfdef.loc[dfdef.index[i], \"Valeur ajoutée du taux de réussite_TOTAL_Pro\"] =np.nan\n"
+   ]
+  },
+  {
+   "cell_type": "code",
    "execution_count": 3,
    "id": "5f48db35-0d4b-4617-a404-1fec796604e8",
    "metadata": {},
@@ -41,100 +244,9 @@
     }
    ],
    "source": [
-    "\n",
-    "\n",
-    "import numpy as np\n",
-    "import pandas as pd\n",
-    "import matplotlib.pyplot as plt\n",
-    "import seaborn as sns\n",
-    "from sklearn.linear_model import LinearRegression\n",
-    "from sklearn.metrics import r2_score\n",
-    "\n",
-    "df = pd.read_excel (\"ival-2021---complet-xlsx-112652.xlsx\", header = [0,1])\n",
-    "\n",
-    "fichier_LGT = df.copy()\n",
-    "fichier_LGT = fichier_LGT.drop ([\"Valeur ajoutée du taux d'accès\", \"Taux d'accès attendus\", \"Taux d'accès bruts\", \"Effectifs à la rentrée 2021\", \"Taux de mentions attendus\", \"Taux de réussite attendus\", \"Taux de mentions bruts\", \"Valeur ajoutée de taux de mentions\"], axis = 1)\n",
-    "\n",
-    "fichier_LGT = fichier_LGT.fillna(0)\n",
-    "#fichier.loc[:,(\"Nombre d'élèves présents au Bac\",\"Somme Pro\")] = fichier[\"Nombre d'élèves présents au Bac\", \"STMG\"] + fichier[\"Nombre d'élèves présents au Bac\", \"STI2D\"] + fichier[\"Nombre d'élèves présents au Bac\", \"STD2A\"]+fichier[\"Nombre d'élèves présents au Bac\", \"STL\"]+df_rose[\"Nombre d'élèves présents au Bac\", \"ST2S\"]+fichier[\"Nombre d'élèves présents au Bac\", \"S2TMD\"]+fichier[\"Nombre d'élèves présents au Bac\", \"STHR\"]#\n",
-    "fichier_LGT.loc[:,(\"Nombre d'élèves présents au Bac\",\"Somme Techno\")] = fichier_LGT[\"Nombre d'élèves présents au Bac\", 'TOTAL']- fichier_LGT[\"Nombre d'élèves présents au Bac\", \"GNLE\"]\n",
-    "fichier_LGT[\"Nombre d'élèves présents au Bac\"]\n",
-    "\n",
-    "stmg = fichier_LGT[\"Taux de réussite bruts\", \"STMG\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STMG\"]\n",
-    "sti2d = fichier_LGT[\"Taux de réussite bruts\", \"STI2D\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STI2D\"]\n",
-    "std2a = fichier_LGT[\"Taux de réussite bruts\", \"STD2A\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STD2A\"]\n",
-    "stl = fichier_LGT[\"Taux de réussite bruts\", \"STL\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STL\"]\n",
-    "st2s = fichier_LGT[\"Taux de réussite bruts\", \"ST2S\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"ST2S\"]\n",
-    "s2tmd = fichier_LGT[\"Taux de réussite bruts\", \"S2TMD\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"S2TMD\"]\n",
-    "sthr = fichier_LGT[\"Taux de réussite bruts\", \"STHR\"]*fichier_LGT[\"Nombre d'élèves présents au Bac\", \"STHR\"]\n",
-    "taux_tech_brut = (stmg + sti2d + std2a + stl + st2s + s2tmd + sthr)/fichier_LGT[\"Nombre d'élèves présents au Bac\",\"Somme Techno\"]\n",
-    "\n",
-    "\n",
-    "fichier_LGT.loc[(fichier_LGT[\"Nombre d'élèves présents au Bac\",\"Somme Techno\"] > 0.5),(\"Taux de réussite bruts\", \"Taux brut techno\")] = taux_tech_brut #>0.5 pour éviter erreurs d'arrondi de flottants#\n",
-    "fichier_LGT[\"Taux de réussite bruts\"]\n",
-    "\n",
-    "liste= [\"GNLE\", \"STMG\", \"STI2D\", \"STD2A\", \"STL\", \"ST2S\", \"S2TMD\", \"STHR\", \"TOTAL\"]\n",
-    "for i in liste:\n",
-    "    fichier_LGT.loc[fichier_LGT[\"Valeur ajoutée du taux de réussite\", i] == \"ND\", (\"Valeur ajoutée du taux de réussite\", i)] = np.NaN\n",
-    "    fichier_LGT[\"Valeur ajoutée du taux de réussite\", i] = pd.to_numeric(fichier_LGT[\"Valeur ajoutée du taux de réussite\", i])\n",
-    "fichier_LGT[\"Valeur ajoutée du taux de réussite\"].info()\n",
-    "fichier_LGT[\"Valeur ajoutée du taux de réussite\"]\n",
-    "\n",
-    "fichier_LGT.columns = fichier_LGT.columns.map('_'.join).str.strip('_')\n",
-    "fichier_LGT = fichier_LGT.drop([\"Nombre d'élèves présents au Bac_STMG\",\"Nombre d'élèves présents au Bac_STI2D\", \"Nombre d'élèves présents au Bac_STD2A\", \"Nombre d'élèves présents au Bac_STL\", \"Nombre d'élèves présents au Bac_ST2S\",\"Nombre d'élèves présents au Bac_S2TMD\", \"Nombre d'élèves présents au Bac_STHR\", \"Taux de réussite bruts_STMG\",\n",
-    "\"Taux de réussite bruts_STI2D\",\"Taux de réussite bruts_STD2A\",\"Taux de réussite bruts_STL\",\"Taux de réussite bruts_ST2S\",\"Taux de réussite bruts_S2TMD\",\"Taux de réussite bruts_STHR\", \"Valeur ajoutée du taux de réussite_STMG\",\"Valeur ajoutée du taux de réussite_STI2D\",\"Valeur ajoutée du taux de réussite_STD2A\", \"Valeur ajoutée du taux de réussite_STL\", \"Valeur ajoutée du taux de réussite_ST2S\", \"Valeur ajoutée du taux de réussite_S2TMD\", \"Valeur ajoutée du taux de réussite_STHR\"], axis=1)\n",
-    "\n",
-    "df2 = pd.read_excel (\"ival-2021---complet-xlsx-112652.xlsx\", sheet_name = 1, header = [0,1])\n",
-    "\n",
-    "fichier_LP = df2.copy()\n",
-    "fichier_LP = fichier_LP.drop ([\"Valeur ajoutée du taux d'accès\", \"Taux d'accès attendus\", \"Taux d'accès bruts\", \"Effectifs à la rentrée 2021\", \"Taux de mentions attendus\", \"Taux de réussite attendus\"], axis = 1)\n",
-    "fichier_LP.columns = fichier_LP.columns.map('_'.join).str.strip('_')\n",
-    "col_cons = ['Informations établissement_Académie', 'Informations établissement_Département', 'Informations établissement_Etablissement', 'Informations établissement_Ville', 'Informations établissement_UAI', 'Informations établissement_Code commune', 'Informations établissement_Secteur', \"Nombre d'élèves présents au Bac_TOTAL\", 'Taux de réussite bruts_TOTAL', 'Valeur ajoutée du taux de réussite_TOTAL']\n",
-    "fichier_LP = fichier_LP[col_cons]\n",
-    "fichier_LP = fichier_LP.rename(columns={\"Nombre d'élèves présents au Bac_TOTAL\": \"Nombre d'élèves présents au Bac_TOTAL_Pro\"})\n",
-    "fichier_LP = fichier_LP.rename(columns={\"Taux de réussite bruts_TOTAL\" : \"Taux de réussite bruts_TOTAL_Pro\"})\n",
-    "fichier_LP = fichier_LP.rename(columns={\"Taux de mentions bruts_TOTAL\" : \"Taux de mentions bruts_TOTAL_Pro\"})\n",
-    "fichier_LP = fichier_LP.rename(columns={\"Valeur ajoutée du taux de réussite_TOTAL\" : \"Valeur ajoutée du taux de réussite_TOTAL_Pro\"})\n",
-    "fichier_LP\n",
-    "\n",
-    "\n",
-    "\n",
-    "dftotale = pd.concat([fichier_LGT, fichier_LP])\n",
-    "dftotale\n",
-    "\n",
-    "df_communes = pd.read_excel(\"FILO2019_DEC_COM.xlsx\", sheet_name = 1, header=[4,5])\n",
-    "df_com = df_communes.copy()\n",
-    "df_com = df_com.drop(['PMIMP19', 'Q119', 'Q319','Q3_Q1','D119', 'D219', 'D319', 'D419', 'D619', 'D719', 'D819', 'D919', 'RD', 'S80S2019', 'PACT19', 'PTSA19', 'PCHO19', 'PBEN19', 'PPEN19', 'PAUT19'], axis = 1, level = 1 )\n",
-    "df_com\n",
-    "\n",
-    "df_com = df_com.dropna(axis = 0, how = \"any\")\n",
-    "df_com\n",
-    "\n",
-    "df_com.columns = df_com.columns.map('_'.join).str.strip('_') #On indexe de manière simple la base de données des communes pour faciliter la jointure\n",
-    "dflyccom = pd.merge(dftotale, df_com, how='left', left_on='Informations établissement_Code commune', right_on='Code géographique_CODGEO')\n",
-    "dflyccom\n",
-    "\n",
-    "dfdef = dflyccom.copy()\n",
-    "\n",
-    "dfdef[\"Nombre d'élèves présents au Bac_GNLE\"]= dfdef[\"Nombre d'élèves présents au Bac_GNLE\"].replace(0, np.nan)\n",
-    "dfdef[\"Nombre d'élèves présents au Bac_Somme Techno\"] = dfdef[\"Nombre d'élèves présents au Bac_Somme Techno\"].replace(0, np.nan)\n",
-    "dfdef[\"Nombre d'élèves présents au Bac_TOTAL_Pro\"] = dfdef[\"Nombre d'élèves présents au Bac_TOTAL_Pro\"].replace(0, np.nan)\n",
-    "for i in range(4329):\n",
-    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_GNLE\"])==True: #Si personne ne s'est présenté au bac général\n",
-    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_GNLE\"] = np.nan #On n'associe pas de valeur au taux de réussite brut\n",
-    "        dfdef.loc[dfdef.index[i],\"Valeur ajoutée du taux de réussite_GNLE\"] = np.nan #On n'associe pas de valeur à la valeur ajoutée du taux de réussite\n",
-    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_Somme Techno\"])==True: #Bac technologique \n",
-    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_Taux brut techno\"] = np.nan\n",
-    "        dfdef.loc[dfdef.index[i],\"Valeur ajoutée du taux de réussite_Valeur ajoutée techno\"] = np.nan\n",
-    "    if np.isnan(dfdef.loc[dfdef.index[i], \"Nombre d'élèves présents au Bac_TOTAL_Pro\"])==True: #Bac Pro\n",
-    "        dfdef.loc[dfdef.index[i],\"Taux de réussite bruts_TOTAL_Pro\"] = np.nan\n",
-    "        dfdef.loc[dfdef.index[i], \"Valeur ajoutée du taux de réussite_TOTAL_Pro\"] =np.nan\n",
-    "\n",
     "df_reg = dfdef[[ \"Médiane (€)_Q219\", \"Indice de Gini_GI19\", \"Taux de réussite bruts_GNLE\"]]\n",
     "df_reg = df_reg.dropna(axis = 0, how = \"any\")\n",
     "df_reg\n",
-    "\n",
-    "import statsmodels.api as sm\n",
     "\n",
     "y = df_reg[[\"Taux de réussite bruts_GNLE\"]]\n",
     "X = df_reg [[\"Médiane (€)_Q219\", \"Indice de Gini_GI19\"]]\n",
